@@ -1,5 +1,8 @@
 {
   "dependencies": {
-    "@datafire/ebay_sell_fulfillment": "4.0.0"
-  }
+    "@datafire/ebay_sell_fulfillment": "4.0.0",
+    "mongodb": ""
+  },
+  "name": "itsyourdayboutique",
+  "version": "1.0.0"
 }
