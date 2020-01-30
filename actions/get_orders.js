@@ -11,6 +11,6 @@ module.exports = new datafire.Action({
     let orderSearchPagedCollection = await ebay_sell_fulfillment.getOrders({
       filter: filter,
     }, context);
-    return orderSearchPagedCollection;
+    return orderSearchPagedCollection.orders;
   },
 });
