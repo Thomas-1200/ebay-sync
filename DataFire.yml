@@ -2,8 +2,6 @@ options:
   cors: true
 actions:
   get_orders: ./actions/get_orders.js
-  update_item: ./actions/update.js
-  update_db: ./actions/update_db.js
 tasks:
   get_order_task:
     schedule: rate(1 hour)
