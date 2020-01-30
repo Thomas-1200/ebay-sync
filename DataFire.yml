@@ -2,3 +2,10 @@ options:
   cors: true
 actions:
   get_orders: ./actions/get_orders.js
+tasks:
+  get_order_task:
+    schedule: rate(1 hour)
+    action: get_orders
+    accounts: {}
+    input: {}
+    monitor: null
