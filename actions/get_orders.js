@@ -24,27 +24,26 @@ module.exports = new datafire.Action({
     ordersFound = orderSearchPagedCollection.orders.length;
     for(let i = 0; i < orderSearchPagedCollection.orders.length; i++) {
       let item = orderSearchPagedCollection.orders[i];
-      await collection.find({orderId: item.orderId}).toArray((err, results) => {
-        if(err) throw err;
-        if (results.length < 1) {
-          	needsInserting.push(item);
-        } else {
-        	needsUpdating.push(item);
-        }
-      });
+      let found = await collection.findOne({orderId: item.orderId});
+       
+      if (found) {
+        needsUpdating.push(item);
+      } else {
+      	needsInserting.push(item);
+      }
     }
+    
     for (let i = 0; i < needsUpdating.length; i++) {
-        updated++
-      	await collection.updateOne({orderId:needsUpdating[i].orderId}, needsUpdating[i]);
+    	await collection.replaceOne({orderId:needsUpdating[i].orderId}, needsUpdating[i]);
+      	updated++;
     }
     
-    if (needsInserting.length > 0) {
-    	await collection.insertMany(needsInserting);
-    	added = needsInserting.length;
+    for (let i = 0; i < needsInserting.length; i++) {
+    	await collection.insertOne(needsInserting[i]);
+        added++;
     }
     
-    message = `orders found: ${ordersFound}, orders updated: ${updated}, orders inserted: ${added}`;
-    
+    message = "orders found: " + ordersFound + ", orders updated: " + updated + ", orders inserted: " + added;
     return message;
     },
 });
