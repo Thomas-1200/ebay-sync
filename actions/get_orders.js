@@ -26,7 +26,7 @@ module.exports = new datafire.Action({
       let item = orderSearchPagedCollection.orders[i];
       let found = await collection.findOne({orderId: item.orderId});
        
-      if (found) {
+      if (found && found.orderId === item.orderId) {
         needsUpdating.push(item);
       } else {
       	needsInserting.push(item);
