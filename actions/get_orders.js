@@ -5,7 +5,7 @@ let date = new Date();
 date.setDate(date.getDate() - 1);
 let filter = 'lastmodifieddate:[' + date.toISOString() + '..]';
 let MongoClient = require('mongodb').MongoClient;
-let uri = "mongodb+srv://test:test@cluster0-hcq6x.mongodb.net";
+let uri = "mongodb+srv://iyd-admin:tcQrNRIkWvxz5dPp4LWp0PdRhTZAn5lx1KSeDtkR42DDMkwppZGsJdj3IuI1gvrl@cluster0-hcq6x.mongodb.net";
 let updated = 0;
 let added = 0;
 let ordersFound = 0;
