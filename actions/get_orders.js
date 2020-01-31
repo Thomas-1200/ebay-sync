@@ -18,7 +18,7 @@ module.exports = new datafire.Action({
     let orderSearchPagedCollection = await ebay_sell_fulfillment.getOrders({
       filter: filter,
     }, context);
-    let client = new MongoClient("mongodb+srv://test:test@cluster0-hcq6x.mongodb.net", { useNewUrlParser: true, useUnifiedTopology: true });
+    let client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
     await client.connect() 
     let collection = await client.db("itsyourdayboutique").collection("orders");
     ordersFound = orderSearchPagedCollection.orders.length;
