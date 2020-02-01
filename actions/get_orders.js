@@ -86,8 +86,9 @@ module.exports = new datafire.Action({
       	if (existingRecord.creationDate) {
       		newRecord.creationDate = existingRecord.creationDate;
         }
-
-      	newRecord.orders.push(...existingRecord.orders);
+		if (existingRecord.orders.indexOf(newRecord.orders[0]) === -1) {
+      		newRecord.orders.push(...existingRecord.orders);
+        }
       	await customerCollection.replaceOne({username:newRecord.username}, newRecord);
       	existingCustomersUpdated++
     }
