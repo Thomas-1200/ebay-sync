@@ -23,12 +23,12 @@ module.exports = new datafire.Action({
       filter: filter,
     }, context);
     let client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-    await client.connect() 
+    await client.connect()
     let collection = await client.db("itsyourdayboutique").collection("orders");
     let customerCollection = await client.db("itsyourdayboutique").collection("customers");
     ordersFound = orderSearchPagedCollection.orders.length;
     for(let i = 0; i < orderSearchPagedCollection.orders.length; i++) {
-      
+
       let item = orderSearchPagedCollection.orders[i];
       let customer = {
         username: item.buyer.username,
@@ -47,28 +47,28 @@ module.exports = new datafire.Action({
       } else {
       	needsInserting.push(item);
       }
-      
+
       if (customerFound && customerFound.username === customer.username) {
        	existingCustomers.push([customer, customerFound]);
       } else {
       	newCustomers.push(customer);
       }
     }
-    
+
     for (let i = 0; i < needsUpdating.length; i++) {
     	await collection.replaceOne({orderId:needsUpdating[i].orderId}, needsUpdating[i]);
       	updated++;
     }
-    
+
     for (let i = 0; i < needsInserting.length; i++) {
     	await collection.insertOne(needsInserting[i]);
         added++;
     }
-    
+
     for (let i = 0; i < existingCustomers.length; i++) {
     	let existingRecord = existingCustomers[i][1];
       	let newRecord = existingCustomers[i][0];
-      
+
       	if (existingRecord.fullname.length > 0 && newRecord.fullname.length < 1) {
         	newRecord.fullname = existingRecord.fullname;
         }
@@ -81,17 +81,17 @@ module.exports = new datafire.Action({
       	if (existingRecord.contact.address.addressLine1.length > 0 && newRecord.contact.address.addressLine1.length < 1) {
         	newRecord.contact.address = existingRecord.contact.address;
         }
-      
+
       	newRecord.orders.push(...existingRecord.orders);
       	await customerCollection.replaceOne({username:newRecord.username}, newRecord);
       	existingCustomersUpdated++
     }
-    
+
     for (let i = 0; i < newCustomers.length; i++) {
     	await customerCollection.insertOne(newCustomers[i]);
       	newCustomersAdded++
     }
-    
+
     message = "orders found: " + ordersFound + ", orders updated: " + updated + ", orders inserted: " + added + ", customers updated: " + existingCustomersUpdated + ", customers added: " + newCustomersAdded;
     return message;
     },
