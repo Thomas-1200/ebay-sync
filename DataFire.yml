@@ -5,7 +5,7 @@ actions:
   test: ./actions/test.js
 tasks:
   get_orders_task:
-    schedule: rate(10 minutes)
+    schedule: rate(6 hours)
     action: get_orders
     accounts: {}
 paths:
