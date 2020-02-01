@@ -20,7 +20,7 @@ let ebay_sell_fulfillment = require('@datafire/ebay_sell_fulfillment').actions;
 module.exports = new datafire.Action({
   handler: async (input, context) => {
     let orderSearchPagedCollection = await ebay_sell_fulfillment.getOrders({
-      limit: '400',
+      filter: filter,
     }, context);
     let client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
     await client.connect()
