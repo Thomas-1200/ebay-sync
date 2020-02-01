@@ -20,7 +20,7 @@ let ebay_sell_fulfillment = require('@datafire/ebay_sell_fulfillment').actions;
 module.exports = new datafire.Action({
   handler: async (input, context) => {
     let orderSearchPagedCollection = await ebay_sell_fulfillment.getOrders({
-      filter: filter,
+      limit: '400',
     }, context);
     let client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
     await client.connect()
@@ -38,7 +38,9 @@ module.exports = new datafire.Action({
           	phone: item.fulfillmentStartInstructions[0].shippingStep.shipTo.primaryPhone.phoneNumber || "",
           	address: item.fulfillmentStartInstructions[0].shippingStep.shipTo.contactAddress || {}
         },
-        orders: [item.orderId]
+        orders: [item.orderId],
+        creationDate: item.creationDate,
+        lastModifiedDate: item.lastModifiedDate
       }
       let found = await collection.findOne({orderId: item.orderId});
       let customerFound = await customerCollection.findOne({username: customer.username});
@@ -80,6 +82,9 @@ module.exports = new datafire.Action({
         }
       	if (existingRecord.contact.address.addressLine1.length > 0 && newRecord.contact.address.addressLine1.length < 1) {
         	newRecord.contact.address = existingRecord.contact.address;
+        }
+      	if (existingRecord.creationDate) {
+      		newRecord.creationDate = existingRecord.creationDate;
         }
 
       	newRecord.orders.push(...existingRecord.orders);
