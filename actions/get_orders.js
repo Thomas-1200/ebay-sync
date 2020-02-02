@@ -25,18 +25,15 @@ module.exports = new datafire.Action({
     
     let systemSettings = await settings.findOne({user:'system'});
     let lastModifiedDate = systemSettings.updateSettings.lastModifiedDate;
+    let lastOrder = {};
     if (lastModifiedDate === "") {
-      	lastOrder = await collection.findOne({}, { 
-          sort: { lastModifiedDate: -1 } },
-          (err, data) => {
-             console.log(data);
-          }
-        )
+      	lastOrder = await collection.findOne({}, {sort: { lastModifiedDate: -1 }});
       	lastModifiedDate = lastOrder.lastModifiedDate;
-      	systemSettings.lastModifiedDate = lastModifiedDate;
+      	systemSettings.updateSettings.lastModifiedDate = lastModifiedDate;
       	await settings.replaceOne({user:'system'}, systemSettings);
     }
-    let filter = 'lastModifiedDate:[' + lastModifiedDate + '..]';
+    
+    let filter = 'lastmodifieddate:[' + lastModifiedDate + '..]';
     
     let orderSearchPagedCollection = await ebay_sell_fulfillment.getOrders({
       filter: filter,
@@ -113,6 +110,11 @@ module.exports = new datafire.Action({
     	await customerCollection.insertOne(newCustomers[i]);
       	newCustomersAdded++
     }
+    
+    lastOrder = await collection.findOne({}, {sort: { lastModifiedDate: -1 }});
+    lastModifiedDate = lastOrder.lastModifiedDate;
+    systemSettings.updateSettings.lastModifiedDate = lastModifiedDate;
+    await settings.replaceOne({user:'system'}, systemSettings);
 
     message = "orders found: " + ordersFound + ", orders updated: " + updated + ", orders inserted: " + added + ", customers updated: " + existingCustomersUpdated + ", customers added: " + newCustomersAdded;
     return message;
