@@ -1,9 +1,6 @@
 "use strict";
 let datafire = require('datafire');
 let message = '';
-let date = new Date();
-date.setDate(date.getDate() - 1);
-let filter = 'lastmodifieddate:[' + date.toISOString() + '..]';
 let MongoClient = require('mongodb').MongoClient;
 let uri = "mongodb+srv://iyd-admin:tcQrNRIkWvxz5dPp4LWp0PdRhTZAn5lx1KSeDtkR42DDMkwppZGsJdj3IuI1gvrl@cluster0-hcq6x.mongodb.net";
 let updated = 0;
@@ -19,13 +16,32 @@ let existingCustomersUpdated = 0;
 let ebay_sell_fulfillment = require('@datafire/ebay_sell_fulfillment').actions;
 module.exports = new datafire.Action({
   handler: async (input, context) => {
+    
+    let client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    await client.connect()
+    let settings = await client.db("itsyourdayboutique").collection("settings");
+    let collection = await client.db("itsyourdayboutique").collection("orders");
+    let customerCollection = await client.db("itsyourdayboutique").collection("customers");
+    
+    let systemSettings = await settings.findOne({user:'system'});
+    let lastModifiedDate = systemSettings.updateSettings.lastModifiedDate;
+    if (lastModifiedDate === "") {
+      	lastOrder = await collection.findOne({}, { 
+          sort: { lastModifiedDate: -1 } },
+          (err, data) => {
+             console.log(data);
+          }
+        )
+      	lastModifiedDate = lastOrder.lastModifiedDate;
+      	systemSettings.lastModifiedDate = lastModifiedDate;
+      	await settings.replaceOne({user:'system'}, systemSettings);
+    }
+    let filter = 'lastModifiedDate:[' + lastModifiedDate + '..]';
+    
     let orderSearchPagedCollection = await ebay_sell_fulfillment.getOrders({
       filter: filter,
     }, context);
-    let client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-    await client.connect()
-    let collection = await client.db("itsyourdayboutique").collection("orders");
-    let customerCollection = await client.db("itsyourdayboutique").collection("customers");
+    
     ordersFound = orderSearchPagedCollection.orders.length;
     for(let i = 0; i < orderSearchPagedCollection.orders.length; i++) {
 
